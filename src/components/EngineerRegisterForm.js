@@ -1,40 +1,54 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  Grid,
+  MenuItem,
+  FormControl,
+  Select,
+} from "@mui/material";
 import { collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import dayjs from "dayjs";
-import AddressSearchModal from "../components/AddressSearchModal";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const EngineerRegisterForm = () => {
   const navigate = useNavigate();
-  const [logoUrl, setLogoUrl] = useState("");
+  const [certificateUrl, setCertificateUrl] = useState("");
   const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [addressDetail, setAddressDetail] = useState("");
   const [registeredAt, setRegisteredAt] = useState("");
-  const [ownerName, setOwnerName] = useState("");
-  const [ownerPhone, setOwnerPhone] = useState("");
+  const [engineerPhone, setEngineerPhone] = useState("");
   const [completedCount, setCompletedCount] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [experience, setExperience] = useState("");
+  const [registrationnum, setRegistrationnum] = useState("");
+  const [profile, setProfile] = useState("");
+  const [selectedPartnerId, setSelectedPartnerId] = useState("");
+  const { partner } = useAppContext();
 
   const handleSubmit = async () => {
     try {
-      const docRef = doc(collection(db, "Partner"));
-      const partnerId = docRef.id;
+      const selectedPartner = partner.find(
+        (p) => p.partner_id === selectedPartnerId
+      );
+      const docRef = doc(collection(db, "Engineer"));
+      const engineerId = docRef.id;
 
       const payload = {
-        partner_id: partnerId,
+        engineer_id: engineerId,
         name,
-        address,
-        address_detail: addressDetail,
         registered_at: registeredAt
           ? dayjs(registeredAt).format("YYYY년 MM월 DD일")
           : "",
-        owner_name: ownerName,
-        owner_phone: ownerPhone,
+        phone: engineerPhone,
+        experience: parseInt(experience) || 0,
+        resident_registration_number: registrationnum,
         completed_request_count: parseInt(completedCount) || 0,
-        logo_image_url: logoUrl,
+        certificate_file_url: certificateUrl,
+        profile_image_url: profile,
+        partner_id: selectedPartner?.partner_id || "",
       };
 
       await setDoc(docRef, payload);
@@ -49,34 +63,36 @@ const EngineerRegisterForm = () => {
   return (
     <Box px={4} pt={4} maxWidth={600} ml={4}>
       <Grid container spacing={2} direction="column">
-        <FormRow label="업체명" required>
+        <FormRow label="소속된 업체 선택" required>
+          <Grid item xs={4}>
+            <FormControl fullWidth size="small">
+              <Select
+                value={selectedPartnerId}
+                onChange={(e) => setSelectedPartnerId(e.target.value)}
+                sx={{ width: 150 }}
+                displayEmpty
+              >
+                <MenuItem value="" disabled>
+                  선택하기
+                </MenuItem>
+                {partner.map((p) => (
+                  <MenuItem key={p.partner_id} value={p.partner_id}>
+                    {p.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </FormRow>
+
+        <FormRow label="기사님 이름" required>
           <TextField
             fullWidth
             size="small"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="업체명"
+            placeholder="기사님 이름"
           />
-        </FormRow>
-
-        <FormRow label="업체주소" required>
-          <Box display="flex" gap={1} flexDirection="column">
-            <TextField
-              size="small"
-              placeholder="주소검색"
-              fullWidth
-              value={address}
-              onClick={() => setIsModalOpen(true)}
-              InputProps={{ readOnly: true }}
-            />
-            <TextField
-              size="small"
-              placeholder="상세주소"
-              fullWidth
-              value={addressDetail}
-              onChange={(e) => setAddressDetail(e.target.value)}
-            />
-          </Box>
         </FormRow>
 
         <FormRow label="등록일" required>
@@ -90,23 +106,13 @@ const EngineerRegisterForm = () => {
           />
         </FormRow>
 
-        <FormRow label="대표님 성함" required>
+        <FormRow label="기사님 연락처" required>
           <TextField
             size="small"
             fullWidth
-            placeholder="대표님 성함"
-            value={ownerName}
-            onChange={(e) => setOwnerName(e.target.value)}
-          />
-        </FormRow>
-
-        <FormRow label="대표님 연락처" required>
-          <TextField
-            size="small"
-            fullWidth
-            placeholder="대표님 연락처"
-            value={ownerPhone}
-            onChange={(e) => setOwnerPhone(e.target.value)}
+            placeholder="기사님 연락처"
+            value={engineerPhone}
+            onChange={(e) => setEngineerPhone(e.target.value)}
           />
         </FormRow>
 
@@ -122,14 +128,48 @@ const EngineerRegisterForm = () => {
           />
         </FormRow>
 
-        <FormRow label="로고이미지" required>
+        <FormRow label="경력(년)" required>
+          <TextField
+            type="number"
+            size="small"
+            fullWidth
+            placeholder="숫자만 입력"
+            inputProps={{ min: 0 }}
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+          />
+        </FormRow>
+
+        <FormRow label="기사님 등록번호입력" required>
+          <TextField
+            size="small"
+            fullWidth
+            placeholder="기사님 등록번호입력"
+            value={registrationnum}
+            onChange={(e) => setRegistrationnum(e.target.value)}
+          />
+        </FormRow>
+
+        <FormRow label="증명서 파일 url" required>
           <Box width="100%">
             <TextField
               size="small"
-              placeholder="로고 이미지 URL 입력"
+              placeholder="증명서 파일 URL 입력"
               fullWidth
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
+              value={certificateUrl}
+              onChange={(e) => setCertificateUrl(e.target.value)}
+            />
+          </Box>
+        </FormRow>
+
+        <FormRow label="프로필 파일 url" required>
+          <Box width="100%">
+            <TextField
+              size="small"
+              placeholder="프로필 파일 URL 입력"
+              fullWidth
+              value={profile}
+              onChange={(e) => setProfile(e.target.value)}
             />
           </Box>
         </FormRow>
@@ -142,12 +182,6 @@ const EngineerRegisterForm = () => {
           </Box>
         </Grid>
       </Grid>
-
-      <AddressSearchModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onComplete={(selectedAddress) => setAddress(selectedAddress)}
-      />
     </Box>
   );
 };

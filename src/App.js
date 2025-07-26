@@ -12,6 +12,7 @@ import MapListPage from "./pages/MapListPage";
 import Topbar from "./layout/Topbar";
 import { AppProvider } from "./context/AppContext";
 import PartnerRegisterPage from "./pages/PartnerRegisterPage";
+import MemberRegisterPage from "./pages/MemberRegisterPage";
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
             path="/partner-company-register"
             element={<PartnerRegisterPage />}
           />
+          <Route path="/member-register" element={<MemberRegisterPage />} />
         </Routes>
       </Router>
     </AppProvider>

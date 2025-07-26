@@ -206,6 +206,7 @@ const InquiryDetails = () => {
                 <InfoCard
                   title="의뢰서"
                   items={[
+                    ["의뢰서 uid", selected.request_id],
                     ["의뢰 생성일", selected.created_at],
                     ["의뢰 수락일", selected.accepted_at],
                     ["의뢰 완료일", selected.completed_at],

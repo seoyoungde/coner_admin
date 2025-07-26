@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "coner-database"
+  },
+  "targets": {
+    "coner-database": {
+      "hosting": {
+        "admin": [
+          "coner-admin"
+        ]
+      }
+    }
+  }
+}

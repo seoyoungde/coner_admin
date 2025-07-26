@@ -18,7 +18,7 @@ const LoginPage = () => {
 
   const admins = [
     { id: "seoyoung", pw: "990906" },
-    { id: "admin2", pw: "pass5678" },
+    { id: "ceo@coner.kr", pw: "tjwlsgud1!" },
   ];
 
   const handleLogin = () => {

@@ -59,6 +59,7 @@ export const AppProvider = ({ children }) => {
         engineer,
         partner,
         payment,
+        setRequest,
         request,
         refreshAll,
       }}

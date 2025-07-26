@@ -1,4 +1,3 @@
-// src/components/Sidebar.jsx
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -17,17 +16,24 @@ const Sidebar = () => {
     { label: "신규 업체 등록", path: "/partner-company-register" },
     { label: "회원 목록", path: "/member-list" },
     { label: "회원 등록", path: "/member-register" },
+    { label: "휴지통", path: "/" },
   ];
 
   return (
     <Box
-      width="150px"
-      borderRight="1px solid #ccc"
-      p={2}
-      display="flex"
-      flexDirection="column"
-      justifyContent="space-between"
-      height="130vh"
+      sx={{
+        width: "180px",
+        minWidth: "150px",
+        flexShrink: 0,
+        border: "1px solid #ccc",
+        p: 2,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "170vh",
+        boxSizing: "border-box",
+        backgroundColor: "#fafafa",
+      }}
     >
       <Box>
         <Typography fontWeight="bold" mb={2}>
@@ -42,6 +48,7 @@ const Sidebar = () => {
               cursor: "pointer",
               fontWeight: location.pathname === item.path ? "bold" : "normal",
               color: location.pathname === item.path ? "#1976d2" : "inherit",
+              whiteSpace: "nowrap",
             }}
             onClick={() => navigate(item.path)}
           >
