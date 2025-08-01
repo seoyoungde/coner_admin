@@ -140,11 +140,11 @@ const EngineerRegisterForm = () => {
           />
         </FormRow>
 
-        <FormRow label="기사님 등록번호입력" required>
+        <FormRow label="기사님 주민등록번호입력" required>
           <TextField
             size="small"
             fullWidth
-            placeholder="기사님 등록번호입력"
+            placeholder="기사님 주민등록번호입력"
             value={registrationnum}
             onChange={(e) => setRegistrationnum(e.target.value)}
           />

@@ -3,14 +3,15 @@ import {
   Box,
   Typography,
   Paper,
-  Grid,
+  Button,
   TextField,
   CircularProgress,
 } from "@mui/material";
-import { useAppContext } from "../context/AppContext"; // ✅ AppContext import
+import { useAppContext } from "../context/AppContext";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const PartnerEngineerListPage = () => {
-  const { partner, engineer } = useAppContext(); // ✅ 전역 상태에서 데이터 사용
+  const { partner, engineer } = useAppContext();
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [engineers, setEngineers] = useState([]);
   const [selectedEngineer, setSelectedEngineer] = useState(null);
@@ -18,7 +19,6 @@ const PartnerEngineerListPage = () => {
 
   const loading = partner.length === 0 || engineer.length === 0;
 
-  // 선택된 업체의 소속 기사 필터링
   useEffect(() => {
     if (!selectedPartner) return;
     const filtered = engineer.filter(
@@ -39,7 +39,6 @@ const PartnerEngineerListPage = () => {
     </Box>
   );
 
-  // 검색 기능
   const matchedEngineer = engineer.find((e) =>
     e.name?.toLowerCase().includes(searchText.toLowerCase())
   );
@@ -63,7 +62,6 @@ const PartnerEngineerListPage = () => {
 
   return (
     <Box display="flex" height="100vh">
-      {/* 업체 목록 */}
       <Box width={250} borderRight="1px solid #ddd" p={2} overflow="auto">
         <TextField
           fullWidth
@@ -97,7 +95,6 @@ const PartnerEngineerListPage = () => {
         )}
       </Box>
 
-      {/* 상세 영역 */}
       <Box flex={1} p={2} overflow="auto">
         {!selectedPartner ? (
           <Typography fontSize={14} color="gray">
@@ -105,9 +102,23 @@ const PartnerEngineerListPage = () => {
           </Typography>
         ) : (
           <Box display="flex" gap={2}>
-            {/* 업체 정보 */}
             <Box flex={1} maxWidth="300px">
               <Paper sx={{ p: 2, height: "100%" }}>
+                <Box mb={2}>
+                  <Button
+                    variant="outlined"
+                    sx={{ height: "30px" }}
+                    startIcon={<DeleteIcon />}
+                  >
+                    삭제하기
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ marginLeft: "8px", height: "30px" }}
+                  >
+                    수정하기
+                  </Button>
+                </Box>
                 <Typography fontWeight="bold" fontSize={15} mb={2}>
                   업체 정보
                 </Typography>
@@ -141,6 +152,7 @@ const PartnerEngineerListPage = () => {
                   {renderInfoRow("업체이름", selectedPartner.name)}
                   {renderInfoRow("주소", selectedPartner.address)}
                   {renderInfoRow("상세주소", selectedPartner.address_detail)}
+                  {renderInfoRow("경력", selectedPartner.career)}
                   {renderInfoRow("대표자명", selectedPartner.owner_name)}
                   {renderInfoRow("연락처", selectedPartner.owner_phone)}
                   {renderInfoRow("등록일", selectedPartner.registered_at)}
@@ -152,7 +164,6 @@ const PartnerEngineerListPage = () => {
               </Paper>
             </Box>
 
-            {/* 기사 목록 */}
             <Box flex={1} maxWidth="200px">
               <Paper sx={{ p: 2, height: "100%", overflowY: "auto" }}>
                 <Typography fontWeight="bold" fontSize={14} mb={1}>
@@ -179,10 +190,24 @@ const PartnerEngineerListPage = () => {
               </Paper>
             </Box>
 
-            {/* 기사 상세 */}
             <Box flex={2}>
               {selectedEngineer ? (
                 <Paper sx={{ p: 2 }}>
+                  <Box mb={2}>
+                    <Button
+                      variant="outlined"
+                      sx={{ height: "30px" }}
+                      startIcon={<DeleteIcon />}
+                    >
+                      삭제하기
+                    </Button>
+                    <Button
+                      variant="contained"
+                      sx={{ marginLeft: "8px", height: "30px" }}
+                    >
+                      수정하기
+                    </Button>
+                  </Box>
                   <Typography fontWeight="bold" fontSize={15} mb={2}>
                     기사님 정보
                   </Typography>
@@ -224,7 +249,7 @@ const PartnerEngineerListPage = () => {
                       selectedEngineer.resident_registration_number
                     )}
                     {renderInfoRow("업체 UID", selectedEngineer.partner_id)}
-                    {renderInfoRow("메모", selectedEngineer.memo)}
+                    {/* {renderInfoRow("메모", selectedEngineer.memo)} */}
                   </Box>
                 </Paper>
               ) : (

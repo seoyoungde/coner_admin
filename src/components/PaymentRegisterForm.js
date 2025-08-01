@@ -109,12 +109,7 @@ const PaymentRegisterForm = () => {
                 <MenuItem value="" disabled>
                   결제방식
                 </MenuItem>
-                {[
-                  "기사님에게 직접 결제",
-                  "유선 결제",
-                  "계좌이체",
-                  "현장 카드결제",
-                ].map((m) => (
+                {["기사님에게 직접 결제", "온라인 카드결제"].map((m) => (
                   <MenuItem key={m} value={m}>
                     {m}
                   </MenuItem>
@@ -164,11 +159,11 @@ const PaymentRegisterForm = () => {
                 <MenuItem value="" disabled>
                   상태등록
                 </MenuItem>
-                <MenuItem value="0">0 : 취소</MenuItem>
-                <MenuItem value="1">1 : 접수</MenuItem>
-                <MenuItem value="2">2 : 기사배정완료</MenuItem>
-                <MenuItem value="3">3 : 진행 중</MenuItem>
-                <MenuItem value="4">4 : 서비스완료</MenuItem>
+                <MenuItem value="0">0 : 결제취소</MenuItem>
+                <MenuItem value="1">1 : 결제요청</MenuItem>
+                <MenuItem value="2">2 : 기사님 결제완료</MenuItem>
+                <MenuItem value="3">3 : 수수료 결제대기</MenuItem>
+                <MenuItem value="4">4 : 수수료 결제완료</MenuItem>
               </Select>
             </FormControl>
           ),

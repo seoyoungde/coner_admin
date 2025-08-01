@@ -7,11 +7,13 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import { useAppContext } from "../context/AppContext";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const MemberList = () => {
-  const { customer } = useAppContext(); // ✅ AppContext의 customer 상태 사용
+  const { customer } = useAppContext();
   const [filtered, setFiltered] = useState([]);
   const [selectedMember, setSelectedMember] = useState(null);
   const [searchText, setSearchText] = useState("");
@@ -47,7 +49,6 @@ const MemberList = () => {
 
   return (
     <Box display="flex" height="100vh">
-      {/* 왼쪽 리스트 영역 */}
       <Box width={250} borderRight="1px solid #ddd" p={2} overflow="auto">
         <TextField
           fullWidth
@@ -70,7 +71,6 @@ const MemberList = () => {
           <ToggleButton value="deleted">탈퇴회원</ToggleButton>
         </ToggleButtonGroup>
 
-        {/* 로딩 대신 customer가 비어 있는 경우 스피너 표시 */}
         {customer.length === 0 ? (
           <Box display="flex" justifyContent="center" mt={2}>
             <CircularProgress size={24} />
@@ -94,7 +94,6 @@ const MemberList = () => {
         )}
       </Box>
 
-      {/* 오른쪽 상세 정보 영역 */}
       <Box flex={1} p={2}>
         {!selectedMember ? (
           <Typography fontSize={14} color="gray">
@@ -102,6 +101,21 @@ const MemberList = () => {
           </Typography>
         ) : (
           <Paper sx={{ p: 2, maxWidth: 600 }}>
+            <Box mb={2}>
+              <Button
+                variant="outlined"
+                sx={{ height: "30px" }}
+                startIcon={<DeleteIcon />}
+              >
+                삭제하기
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ marginLeft: "8px", height: "30px" }}
+              >
+                수정하기
+              </Button>
+            </Box>
             <Typography fontWeight="bold" fontSize={15} mb={2}>
               회원 정보
             </Typography>

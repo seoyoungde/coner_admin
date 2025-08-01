@@ -11,7 +11,8 @@ import {
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import koLocale from "date-fns/locale/ko";
-import { useAppContext } from "../context/AppContext"; // ✅ AppContext 가져오기
+import { useAppContext } from "../context/AppContext";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const getPaymentStatusText = (code) => {
   switch (code) {
@@ -27,7 +28,7 @@ const getPaymentStatusText = (code) => {
 };
 
 const PaymentList = () => {
-  const { payment } = useAppContext(); // ✅ 전역 상태에서 payment 사용
+  const { payment } = useAppContext();
   const [filteredPayments, setFilteredPayments] = useState([]);
   const [selected, setSelected] = useState(null);
   const [startDate, setStartDate] = useState(null);
@@ -71,7 +72,6 @@ const PaymentList = () => {
   return (
     <Box display="flex">
       <Box display="flex" flexGrow={1} height="100vh">
-        {/* Left Sidebar */}
         <Paper
           sx={{
             width: 250,
@@ -104,7 +104,6 @@ const PaymentList = () => {
           )}
         </Paper>
 
-        {/* Right Content */}
         <Box flex={1} p={3} overflow="auto">
           <Box display="flex" gap={2} mb={2} alignItems="center">
             <LocalizationProvider
@@ -154,6 +153,21 @@ const PaymentList = () => {
               </Typography>
             ) : (
               <Box display="flex" flexDirection="column" gap={1}>
+                <Box mb={2}>
+                  <Button
+                    variant="outlined"
+                    sx={{ height: "30px" }}
+                    startIcon={<DeleteIcon />}
+                  >
+                    삭제하기
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{ marginLeft: "8px", height: "30px" }}
+                  >
+                    수정하기
+                  </Button>
+                </Box>
                 <Typography fontSize={14}>
                   <strong>결제 ID:</strong> {selected.payment_id}
                 </Typography>

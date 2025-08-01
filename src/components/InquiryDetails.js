@@ -8,13 +8,16 @@ import {
   Divider,
   ToggleButton,
   ToggleButtonGroup,
+  MenuItem,
+  Select,
 } from "@mui/material";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import koLocale from "date-fns/locale/ko";
-import { getDoc, doc } from "firebase/firestore";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useAppContext } from "../context/AppContext";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const InquiryDetails = () => {
   const { request } = useAppContext();
@@ -24,6 +27,9 @@ const InquiryDetails = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [statusFilter, setStatusFilter] = useState(null);
+
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedData, setEditedData] = useState({});
 
   useEffect(() => {
     setFilteredInquiries(request);
@@ -35,7 +41,6 @@ const InquiryDetails = () => {
         setPaymentInfo(null);
         return;
       }
-
       try {
         const docRef = doc(db, "Payment", selected.id);
         const docSnap = await getDoc(docRef);
@@ -49,7 +54,6 @@ const InquiryDetails = () => {
         setPaymentInfo(null);
       }
     };
-
     fetchPayment();
   }, [selected]);
 
@@ -72,7 +76,6 @@ const InquiryDetails = () => {
       const inStatus = statusFilter === null || item.status === statusFilter;
       return inDateRange && inStatus;
     });
-
     setFilteredInquiries(filtered);
     setSelected(null);
   };
@@ -115,10 +118,352 @@ const InquiryDetails = () => {
     }
   };
 
+  const handleSave = async () => {
+    try {
+      const docRef = doc(db, "Request", selected.id);
+      await updateDoc(docRef, editedData);
+      alert("수정 완료되었습니다.");
+      setIsEditMode(false);
+      setSelected((prev) => ({ ...prev, ...editedData }));
+      setEditedData({});
+    } catch (e) {
+      console.error("수정 실패:", e);
+      alert("수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  const renderEditable = (field, type = "text") => {
+    const currentValue = editedData[field] ?? selected[field] ?? "";
+
+    if (!isEditMode) {
+      if (Array.isArray(currentValue)) return currentValue.join(", ");
+      return currentValue;
+    }
+
+    if (type === "select") {
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {getStatusText(selected[field])}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: Number(e.target.value) })
+            }
+          >
+            <MenuItem value={0}>취소완료</MenuItem>
+            <MenuItem value={1}>접수 완료</MenuItem>
+            <MenuItem value={2}>기사님배정완료</MenuItem>
+            <MenuItem value={3}>서비스중</MenuItem>
+            <MenuItem value={4}>서비스완료</MenuItem>
+          </Select>
+        </Box>
+      );
+    }
+
+    if (field === "brand") {
+      const brandOptions = [
+        "삼성전자",
+        "LG전자",
+        "캐리어",
+        "센추리",
+        "귀뚜라미",
+        "SK매직",
+        "기타(추천 또는 모름",
+      ];
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            fullWidth
+            sx={{
+              height: 36,
+              fontSize: 13,
+              ".MuiSelect-select": {
+                paddingTop: "6px",
+                paddingBottom: "6px",
+              },
+            }}
+          >
+            {brandOptions.map((label) => (
+              <MenuItem key={label} value={label}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+    if (field === "service_type") {
+      const serviceTypeOptions = [
+        "설치",
+        "설치&에에컨구매",
+        "점검",
+        "청소",
+        "수리",
+        "냉매충전",
+        "이전",
+        "철거",
+      ];
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            fullWidth
+            sx={{
+              height: 36,
+              fontSize: 13,
+              ".MuiSelect-select": {
+                paddingTop: "6px",
+                paddingBottom: "6px",
+              },
+            }}
+          >
+            {serviceTypeOptions.map((label) => (
+              <MenuItem key={label} value={label}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+    if (field === "aircon_type") {
+      const airconTypeOptions = [
+        "벽걸이형",
+        "스탠드형",
+        "천장형",
+        "창문형",
+        "항온항습기",
+      ];
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            fullWidth
+            sx={{
+              height: 36,
+              fontSize: 13,
+              ".MuiSelect-select": {
+                paddingTop: "6px",
+                paddingBottom: "6px",
+              },
+            }}
+          >
+            {airconTypeOptions.map((label) => (
+              <MenuItem key={label} value={label}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+    if (field === "service_time") {
+      const timeOptions = [
+        "오전9시 ~ 오후12시",
+        "오후1시 ~ 오후4시",
+        "오후5시 ~ 오후8시",
+      ];
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            fullWidth
+            sx={{
+              height: 36,
+              fontSize: 13,
+              ".MuiSelect-select": {
+                paddingTop: "6px",
+                paddingBottom: "6px",
+              },
+            }}
+          >
+            {timeOptions.map((label) => (
+              <MenuItem key={label} value={label}>
+                {label}
+              </MenuItem>
+            ))}
+          </Select>
+        </Box>
+      );
+    }
+    if (field === "customer_type") {
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <Select
+            size="small"
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            fullWidth
+            sx={{
+              height: 36, // 전체 높이 조절
+              fontSize: 13,
+              ".MuiSelect-select": {
+                paddingTop: "6px",
+                paddingBottom: "6px",
+              },
+            }}
+          >
+            <MenuItem value="개인(가정)">개인(가정)</MenuItem>
+            <MenuItem value="사업장(기업/매장)">사업장(기업/매장)</MenuItem>
+          </Select>
+        </Box>
+      );
+    }
+    if (type === "date") {
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {selected[field] ?? "-"}
+          </Typography>
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={koLocale}
+          >
+            <DatePicker
+              format="yyyy-MM-dd"
+              value={currentValue ? parseDate(currentValue) : null}
+              onChange={(newVal) =>
+                setEditedData({
+                  ...editedData,
+                  [field]: newVal
+                    ? `${newVal.getFullYear()}년 ${String(
+                        newVal.getMonth() + 1
+                      ).padStart(2, "0")}월 ${String(newVal.getDate()).padStart(
+                        2,
+                        "0"
+                      )}일`
+                    : "",
+                })
+              }
+              slotProps={{
+                textField: {
+                  size: "small",
+                  InputProps: { sx: { height: 36, fontSize: 13 } }, // 높이와 글자 크기 조절
+                },
+              }}
+            />
+          </LocalizationProvider>
+        </Box>
+      );
+    }
+
+    if (Array.isArray(selected[field])) {
+      <Box>
+        <Typography fontSize={12} color="textSecondary" mb={0.5}>
+          현재: {getStatusText(selected[field])}
+        </Typography>
+        <Select
+          size="small"
+          value={currentValue}
+          onChange={(e) =>
+            setEditedData({ ...editedData, [field]: Number(e.target.value) })
+          }
+        >
+          <MenuItem value={0}>취소완료</MenuItem>
+          <MenuItem value={1}>접수 완료</MenuItem>
+          <MenuItem value={2}>기사님배정완료</MenuItem>
+          <MenuItem value={3}>서비스중</MenuItem>
+          <MenuItem value={4}>서비스완료</MenuItem>
+        </Select>
+      </Box>;
+    }
+
+    if (Array.isArray(selected[field])) {
+      return (
+        <Box>
+          <Typography fontSize={12} color="textSecondary" mb={0.5}>
+            현재: {(selected[field] || []).join(", ") || "-"}
+          </Typography>
+          <input
+            value={(currentValue || []).join(", ")}
+            onChange={(e) =>
+              setEditedData({
+                ...editedData,
+                [field]: e.target.value
+                  .split(",")
+                  .map((v) => v.trim())
+                  .filter((v) => v !== ""),
+              })
+            }
+            style={{ width: "100%", fontSize: "13px" }}
+          />
+        </Box>
+      );
+    }
+
+    const isMultilineField = ["detailInfo", "memo"].includes(field);
+
+    return (
+      <Box>
+        <Typography fontSize={12} color="textSecondary" mb={0.5}>
+          현재: {selected[field] ?? "-"}
+        </Typography>
+        {isMultilineField ? (
+          <textarea
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            style={{
+              width: "100%",
+              fontSize: "13px",
+              minHeight: "80px",
+              resize: "vertical",
+            }}
+          />
+        ) : (
+          <input
+            value={currentValue}
+            onChange={(e) =>
+              setEditedData({ ...editedData, [field]: e.target.value })
+            }
+            style={{ width: "100%", fontSize: "13px" }}
+          />
+        )}
+      </Box>
+    );
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={koLocale}>
       <Box display="flex" height="100vh">
-        {/* 왼쪽 목록 영역 */}
         <Box width="250px" p={2} borderRight="1px solid #ddd" overflow="auto">
           <Typography fontWeight="bold" fontSize={14} mb={2}>
             의뢰서 목록
@@ -135,7 +480,11 @@ const InquiryDetails = () => {
                     cursor: "pointer",
                     bgcolor: selected?.id === item.id ? "#eee" : "white",
                   }}
-                  onClick={() => setSelected(item)}
+                  onClick={() => {
+                    setSelected(item);
+                    setIsEditMode(false);
+                    setEditedData({});
+                  }}
                 >
                   <Typography fontSize={13}>{item.request_id}</Typography>
                 </Paper>
@@ -144,7 +493,6 @@ const InquiryDetails = () => {
           )}
         </Box>
 
-        {/* 오른쪽 상세 보기 */}
         <Box flex={1} p={3} overflow="auto">
           <Box display="flex" alignItems="center" gap={2} mb={2}>
             <DatePicker
@@ -192,13 +540,63 @@ const InquiryDetails = () => {
             </Typography>
           ) : (
             <Box display="flex" flexDirection="column" gap={2}>
+              <Box mb={2}>
+                <Button
+                  variant="outlined"
+                  sx={{ height: "30px" }}
+                  startIcon={<DeleteIcon />}
+                >
+                  삭제하기
+                </Button>
+                {isEditMode ? (
+                  <>
+                    <Button
+                      variant="contained"
+                      sx={{ marginLeft: "8px", height: "30px" }}
+                      onClick={handleSave}
+                    >
+                      저장하기
+                    </Button>
+                    <Button
+                      variant="text"
+                      sx={{ marginLeft: "8px", height: "30px" }}
+                      onClick={() => {
+                        setIsEditMode(false);
+                        setEditedData({});
+                      }}
+                    >
+                      취소하기
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="contained"
+                    sx={{ marginLeft: "8px", height: "30px" }}
+                    onClick={() => {
+                      setIsEditMode(true);
+                      setEditedData(selected);
+                    }}
+                  >
+                    수정하기
+                  </Button>
+                )}
+              </Box>
               <Box display="flex" gap={2}>
-                <Section title="에어컨 종류" value={selected.aircon_type} />
-                <Section title="에어컨 브랜드" value={selected.brand} />
-                <Section title="서비스 종류" value={selected.service_type} />
+                <Section
+                  title="에어컨 종류"
+                  value={renderEditable("aircon_type")}
+                />
+                <Section
+                  title="에어컨 브랜드"
+                  value={renderEditable("brand")}
+                />
+                <Section
+                  title="서비스 종류"
+                  value={renderEditable("service_type")}
+                />
                 <Section
                   title="status"
-                  value={getStatusText(selected.status)}
+                  value={renderEditable("status", "select")}
                 />
               </Box>
               <Divider />
@@ -207,20 +605,20 @@ const InquiryDetails = () => {
                   title="의뢰서"
                   items={[
                     ["의뢰서 uid", selected.request_id],
-                    ["의뢰 생성일", selected.created_at],
-                    ["의뢰 수락일", selected.accepted_at],
-                    ["의뢰 완료일", selected.completed_at],
-                    ["서비스진행 일정", selected.service_date],
-                    ["고객 요구사항", selected.detailInfo],
-                    ["고객 요청시간", selected.service_time],
+                    ["의뢰 생성일", renderEditable("created_at", "date")],
+                    ["의뢰 수락일", renderEditable("accepted_at", "date")],
+                    ["의뢰 완료일", renderEditable("completed_at", "date")],
+                    ["서비스진행 일정", renderEditable("service_date", "date")],
+                    ["고객 요구사항", renderEditable("detailInfo")],
+                    ["고객 요청시간", renderEditable("service_time")],
                     [
                       "서비스이미지",
                       (selected.service_images || []).length + "개",
                     ],
                     ["스프린트", (selected.sprint || []).join(", ")],
+                    ["기사님 메모", renderEditable("memo")],
                   ]}
                 />
-
                 <InfoCard
                   title="기사"
                   image={{
@@ -239,7 +637,6 @@ const InquiryDetails = () => {
                     ],
                     ["업체 이름", selected.partner_name],
                     ["업체 UID", selected.partner_uid],
-                    ["기사님 메모", selected.memo],
                   ]}
                 />
               </Box>
@@ -247,18 +644,13 @@ const InquiryDetails = () => {
                 <InfoCard
                   title="고객"
                   items={[
-                    [
-                      "고객 주소 / 상세 주소",
-                      selected.customer_address +
-                        " " +
-                        selected.customer_address_detail,
-                    ],
-                    ["고객 연락처", selected.customer_phone],
-                    ["고객유형", selected.customer_type],
+                    ["고객 주소", renderEditable("customer_address")],
+                    ["상세 주소", renderEditable("customer_address_detail")],
+                    ["고객 연락처", renderEditable("customer_phone")],
+                    ["고객유형", renderEditable("customer_type")],
                     ["고객 UID", selected.customer_uid || "-"],
                   ]}
                 />
-
                 <InfoCard
                   title="결제"
                   items={

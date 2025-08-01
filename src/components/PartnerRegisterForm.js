@@ -17,6 +17,7 @@ const PartnerRegisterForm = () => {
   const [ownerPhone, setOwnerPhone] = useState("");
   const [completedCount, setCompletedCount] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [career, setCareer] = useState("");
 
   const handleSubmit = async () => {
     try {
@@ -33,6 +34,7 @@ const PartnerRegisterForm = () => {
           : "",
         owner_name: ownerName,
         owner_phone: ownerPhone,
+        career: parseInt(career) || 0,
         completed_request_count: parseInt(completedCount) || 0,
         logo_image_url: logoUrl,
       };
@@ -107,6 +109,18 @@ const PartnerRegisterForm = () => {
             placeholder="대표님 연락처"
             value={ownerPhone}
             onChange={(e) => setOwnerPhone(e.target.value)}
+          />
+        </FormRow>
+
+        <FormRow label="경력" required>
+          <TextField
+            type="number"
+            size="small"
+            fullWidth
+            placeholder="숫자만 입력"
+            inputProps={{ min: 0 }}
+            value={career}
+            onChange={(e) => setCareer(e.target.value)}
           />
         </FormRow>
 
